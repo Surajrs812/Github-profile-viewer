@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="githubProfileApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Consolas:wght@400&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body>
+
+<div ng-controller="GitHubProfileController" class="github-profile-container">
+    <h2 class="rounded-title">GitHub Profile Viewer</h2>
+    <label for="username" class="rounded-label">GitHub Username:</label>
+    <div class="username-container">
+        <input type="text" id="username" ng-model="username" placeholder="Enter GitHub username" class="rounded-input">
+        <button ng-click="getProfile()" class="rounded-button">Get Profile</button>
+    </div>
+
+    <div ng-if="error" class="error-message">
+        {{ error }}
+    </div>
+
+    <div ng-if="profile" class="profile-info">
+        <div class="user-details">
+            <img ng-src="{{ profile.avatar_url }}" alt="GitHub Avatar" class="large-avatar">
+            <div>
+                <h3>Github Id: {{ profile.login }}</h3>
+                <p>Name: {{ profile.name }}</p>
+                <p>Bio: {{ profile.bio }}</p>
+                <p>Followers: {{ profile.followers }}</p>
+                <p>Repositories: {{ profile.public_repos }}</p>
+            </div>
+        </div>
+
+        <h4>Repositories:</h4>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Stars</th>
+            </tr>
+            <tr ng-repeat="repo in repositories">
+                <td>{{ repo.name }}</td>
+                <td>{{ repo.description }}</td>
+                <td>{{ repo.stargazers_count }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!--
+<footer class="footer">
+    <p class="project-info">Project by Suraj R S | 5th C | Dept. of ISE | RNSIT</p>
+</footer>
+
+
+
+<script>
+    angular.module('githubProfileApp', [])
+        .controller('GitHubProfileController', function ($scope, $http) {
+            $scope.getProfile = function () {
+                var username = $scope.username;
+                var apiUrl = 'https://api.github.com/users/' + username;
+
+                $http.get(apiUrl)
+                    .then(function (response) {
+                        $scope.error = null;
+                        $scope.profile = response.data;
+                        $scope.getRepositories(username);
+                    })
+                    .catch(function (error) {
+                        if (error.status === 404) {
+                            // GitHub profile not found
+                            $scope.error = 'GitHub profile not found.';
+                            $scope.profile = null;
+                            $scope.repositories = null;
+                        } else {
+                            // Other errors
+                            $scope.error = 'Error fetching GitHub profile.';
+                            console.error('Error fetching GitHub profile:', error);
+                            $scope.profile = null;
+                        }
+                    });
+            };
+
+            $scope.getRepositories = function (username) {
+                var apiUrl = 'https://api.github.com/users/' + username + '/repos';
+
+                $http.get(apiUrl)
+                    .then(function (response) {
+                        $scope.repositories = response.data;
+                    })
+                    .catch(function (error) {
+                        console.error('Error fetching repositories:', error);
+                        $scope.repositories = null;
+                    });
+            };
+        });
+</script>
+
+</body>
+</html>
